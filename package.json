@@ -1,0 +1,17 @@
+{
+  "name": "comtest",
+  "version": "1.0.0",
+  "description": "**Оюутны нэр:** _(бөглөх)_ **Код:** _(бөглөх)_ **k6 version:** ``` k6 v2.3.0 (commit/e088784614, go1.26.8, linux/amd64) ``` _(`k6 version` командыг өөрийн машин дээр ажиллуулж энд оруулна — хувилбар өөр байж болно)_",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
