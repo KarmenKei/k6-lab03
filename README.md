@@ -1,6 +1,7 @@
 # F.CSA313 Программ хангамжийн чанарын баталгаа ба туршилт — Lab 03
 
 **Оюутан:** Ц.Бэлгүтэй
+
 **Оюутны код:** B232270053
 
 ## Зорилго
@@ -33,11 +34,11 @@
 * **Runtime:** Node.js
 * **Framework:** Express.js
 * **Load testing tool:** k6
-* **k6 version:** `k6 v2.2.0 `
+* **k6 version:** `k6 v2.2.0`
 * **Test server:** `localhost:3000`
 * **Normal load:** 20 VU
 * **Normal test duration:** 1 минут
-* **Chaos test duration:** 2 минут
+* **Chaos test duration:** 1 минут
 
 ## API verification
 
@@ -64,7 +65,6 @@ Baseline тестийн үед нийт HTTP request-ийн p95 latency `372.52 
 Baseline үр дүн болон endpoint бүрийн зориулалтыг харгалзан SLO threshold-үүдийг тодорхойлсон. `/cart/add` нь хурдан endpoint тул `p95 < 200 ms`, `/report` нь зориудаар удаашруулсан endpoint тул `p95 < 450 ms`, `/pay` нь тодорхой хэмжээний random error үүсгэдэг тул `error rate < 8%` гэсэн босго сонгосон.
 
 **Result file:** `results/baseline.txt`
-
 
 # Quality Scenarios
 
@@ -96,6 +96,7 @@ API server хэвийн ажиллаж байгаа бөгөөд 20 VU зэрэ�
 * **SLO:** p95 `< 200 ms`
 
 ---
+
 ## Scenario 2 — Report performance
 
 ### 1. Тойм
@@ -121,7 +122,6 @@ API server хэвийн ажиллаж байгаа бөгөөд 20 VU зэрэ�
 ### 6. Хэмжүүр
 
 * **SLI:** `/report` endpoint-ийн p95 response time
-
 * **SLO:** p95 `< 450 ms`
 
 ## Scenario 3 — Төлбөрийн reliability
@@ -165,7 +165,7 @@ API server ажиллаж байгаа бөгөөд `/pay` endpoint руу зэ�
 
 ### 3. Орчны төлөв
 
-Chaos туршилтыг 2 минутын хугацаанд ажиллуулж, системийн endpoint-үүдэд хүсэлтүүд үргэлжлүүлэн илгээнэ.
+Chaos туршилтыг 1 минутын хугацаанд ажиллуулж, системийн endpoint-үүдэд хүсэлтүүд үргэлжлүүлэн илгээнэ.
 
 ### 4. Гадаад өдөөлт
 
@@ -179,7 +179,7 @@ API server-ийн ажиллагааг түр тасалдуулж, хүсэлт
 
 * **SLI:** Successful checks / total checks
 * **SLO:** availability `> 90%`
-* **Chaos test window:** 2 минут
+* **Chaos test window:** 1 минут
 
 ---
 
@@ -190,7 +190,7 @@ API server-ийн ажиллагааг түр тасалдуулж, хүсэлт
 | Cart performance    | `/cart/add` p95 latency | `< 200 ms`      | 20 VU, 1 min       |
 | Report performance  | `/report` p95 latency   | `< 450 ms`      | 20 VU, 1 min       |
 | Payment reliability | `/pay` error rate       | `< 8%`          | 20 VU, 1 min       |
-| System availability | Successful checks       | `> 90%`         | 20 VU, 2 min chaos |
+| System availability | Successful checks       | `> 90%`         | 20 VU, 1 min chaos |
 
 ### Threshold сонгосон шалтгаан
 
@@ -259,17 +259,18 @@ k6 run slo-test.js | tee results/pass.txt
 **Result file:** `results/pass.txt`
 
 ![PASS k6 test](results/pic2.png)
+
 ---
 
 # Chaos Experiment
 
-Availability болон reliability-ийн SLO-г системийн тасалдлын үед шалгахын тулд 2 минутын chaos туршилт хийсэн.
+Availability болон reliability-ийн SLO-г системийн тасалдлын үед шалгахын тулд 1 минутын chaos туршилт хийсэн.
 
 ### Chaos procedure
 
-Chaos туршилтыг 20 VU, 2 минутын хугацаатайгаар ажиллуулсан. k6 тест эхэлснээс хойш ойролцоогоор 30 секундын дараа Express server-ийг `Ctrl+C` ашиглан түр зогсоосон. Server-ийг ойролцоогоор 10 секунд ажиллуулахгүй байлгасны дараа `node server.js` командаар дахин ажиллуулсан. Server зогссон хугацаанд k6-ийн хүсэлтүүд амжилтгүй болж, `connection refused` төрлийн алдаа үүссэн. Server дахин ажилласны дараа хүсэлтүүд дахин хэвийн боловсруулагдсан.
+Chaos туршилтыг 20 VU, 1 минутын хугацаатайгаар ажиллуулсан. Туршилтын үед Express server-ийг түр зогсоосноор k6-ийн хүсэлтүүд амжилтгүй болж, `connection refused` төрлийн алдаа үүссэн. Бодит run-ийн үр дүнд `connection refused` тасалдал ойролцоогоор **31 секунд** үргэлжилсэн.
 
-Ингэснээр бодит server outage үүсгэж, уг тасалдлын үеийн availability болон payment reliability-ийн өөрчлөлтийг k6 ашиглан хэмжсэн.
+Server-ийн ажиллагааг дахин сэргээсний дараа k6 тестийг дуусгасан. Ингэснээр бодит server outage үүсгэж, уг тасалдлын үеийн availability болон payment reliability-ийн өөрчлөлтийг k6 ашиглан хэмжсэн.
 
 **Result file:** `results/chaos.txt`
 
@@ -288,9 +289,9 @@ Chaos туршилтын үед server-ийн ажиллагаанд зориу�
 
 Chaos туршилтын үед:
 
-* **Total requests:** 2931
+* **Total checks:** 2931
 * **Checks succeeded:** 77.03%
-* **Checks failed:** 22.96%
+* **Checks failed:** 22.96% (673 checks)
 * **Pay error rate:** 25.17%
 
 Ингэснээр availability болон payment reliability-ийн threshold хоёулаа зөрчигдсөн.
@@ -311,13 +312,13 @@ Availability > 90%
 100% - 90% = 10%
 ```
 
-Chaos туршилтын нийт хүсэлт:
+Chaos туршилтын нийт checks:
 
 ```text
 2931
 ```
 
-Зөвшөөрөгдөх хамгийн их failed request:
+Зөвшөөрөгдөх хамгийн их failed checks:
 
 ```text
 2931 × 0.10 = 293.1
@@ -342,25 +343,32 @@ Actual  ≈ 673 failed checks
 
 # Time-based Error Budget
 
-Chaos туршилтын хугацаа:
+Chaos туршилтын бодит хугацаа:
 
 ```text
-2 minutes = 120 seconds
+1 minute = 60 seconds
 ```
 
 Availability SLO нь `90%` тул зөвшөөрөгдөх downtime:
 
 ```text
-120 × 0.10 = 12 seconds
+60 × 0.10 = 6 seconds
 ```
 
-Иймээс 2 минутын туршилтын үед time-based error budget нь:
+Иймээс 1 минутын туршилтын үед time-based error budget нь:
 
-**12 секунд**
+**6 секунд**
 
-Туршилтын үед outage ойролцоогоор 10 секунд байсан тул time-based error budget-ийн хувьд 12 секундээс хэтрээгүй.
+Chaos туршилтын үед `connection refused` алдаатай тасалдал ойролцоогоор **31 секунд** үргэлжилсэн.
 
-Гэхдээ request-based availability нь 90%-аас доош орсон тул тухайн туршилтын availability threshold FAIL болсон.
+Тиймээс:
+
+```text
+Allowed downtime ≈ 6 seconds
+Actual outage    ≈ 31 seconds
+```
+
+Бодит outage нь time-based error budget-ээс давсан байна.
 
 ---
 
@@ -393,7 +401,13 @@ Threshold хэрхэн FAIL болж байгааг баталгаажуулах
 Туршилтыг дараах командаар ажиллуулсан:
 
 ```bash
-k6 run slo-test-fail.js 2>&1 | tee results/fail.txt; echo "k6_exit=${pipestatus[1]}"
+k6 run slo-test-fail.js 2>&1 | tee results/fail.txt
+```
+
+`results/fail.txt` файлд k6-ийн exit code-ийг мөн хадгалсан:
+
+```text
+k6_exit=99
 ```
 
 ### FAIL result
@@ -425,19 +439,20 @@ k6 дараах алдааг мэдээлсэн:
 thresholds on metrics 'http_req_duration{name:report}' have been crossed
 ```
 
-Мөн командын төгсгөлд:
+Мөн `results/fail.txt` файлд:
 
 ```text
 k6_exit=99
 ```
 
-гэж гарсан.
+гэж хадгалагдсан.
 
 Ингэснээр threshold FAIL болсон үед k6 нь `99` exit code буцааж байгааг баталгаажуулсан.
 
 **Result file:** `results/fail.txt`
 
 ![FAIL threshold test](results/pic4.png)
+
 ---
 
 # Results Summary
@@ -458,7 +473,7 @@ FAIL тестээр threshold-ийг зөрчсөн үед k6 автоматаа
 
 # Дүгнэлт
 
-Энэхүү лабораторийн ажлаар Quality Scenario-оос SLI, SLO болон k6 threshold хүртэлх чанарын шалгалтын pipeline-г хэрэгжүүлсэн. Системийн `/cart/add`, `/report`, `/pay` гэсэн гурван endpoint дээр өөр өөр чанарын шаардлага тодорхойлсон. Хэвийн 20 VU, 1 минутын тестээр бүх threshold PASS болсон бөгөөд cart-ийн p95 latency 2.79 ms, report-ийн p95 latency 390.14 ms, payment-ийн error rate 3.99% гарсан. Chaos туршилтын үед системийн availability 77.03% болж, 90%-ийн SLO-г хангаагүй. Мөн payment-ийн error rate 25.17% болж 8%-ийн reliability SLO-оос давсан. Request-based error budget-ийн тооцоогоор зөвшөөрөгдөх хэмжээ ойролцоогоор 293 failed checks байсан боловч бодит failed checks 673 болсон. Харин 2 минутын time-based availability error budget нь 12 секунд бөгөөд туршилтын outage энэ хугацаанаас хэтрээгүй. Availability болон reliability нь хоорондоо холбоотой боловч тусдаа чанарын хэмжүүр болохыг chaos туршилтын үр дүнгээр харуулсан. Эцэст нь report endpoint-д зориудаар `p(95)<100 ms` гэсэн хэт хатуу threshold тавихад бодит p95 нь 391.62 ms гарч FAIL болсон бөгөөд k6 `99` exit code буцаасан.
+Энэхүү лабораторийн ажлаар Quality Scenario-оос SLI, SLO болон k6 threshold хүртэлх чанарын шалгалтын pipeline-г хэрэгжүүлсэн. Системийн `/cart/add`, `/report`, `/pay` гэсэн гурван endpoint дээр өөр өөр чанарын шаардлага тодорхойлсон. Хэвийн 20 VU, 1 минутын тестээр бүх threshold PASS болсон бөгөөд cart-ийн p95 latency 2.79 ms, report-ийн p95 latency 390.14 ms, payment-ийн error rate 3.99% гарсан. Chaos туршилтын үед системийн availability 77.03% болж, 90%-ийн SLO-г хангаагүй. Мөн payment-ийн error rate 25.17% болж 8%-ийн reliability SLO-оос давсан. Request-based error budget-ийн тооцоогоор зөвшөөрөгдөх хэмжээ ойролцоогоор 293 failed checks байсан боловч бодит failed checks 673 болсон. Харин 1 минутын time-based availability error budget нь 6 секунд бөгөөд `connection refused` тасалдал ойролцоогоор 31 секунд үргэлжилсэн тул time-based error budget-ээс давсан. Availability болон reliability нь хоорондоо холбоотой боловч тусдаа чанарын хэмжүүр болохыг chaos туршилтын үр дүнгээр харуулсан. Эцэст нь report endpoint-д зориудаар `p(95)<100 ms` гэсэн хэт хатуу threshold тавихад бодит p95 нь 391.62 ms гарч FAIL болсон бөгөөд k6 `99` exit code буцаасан.
 
 # Files
 
@@ -468,8 +483,8 @@ FAIL тестээр threshold-ийг зөрчсөн үед k6 автоматаа
 * `results/baseline.txt` — baseline тестийн output
 * `results/pass.txt` — PASS тестийн output
 * `results/chaos.txt` — chaos тестийн output
-* `results/fail.txt` — FAIL тестийн output
+* `results/fail.txt` — FAIL тестийн output, `k6_exit=99` мөрийг агуулсан
 * `results/pic2.png` — PASS k6 тестийн screenshot
 * `results/pic3.png` — chaos тестийн screenshot
-* `results/pic4.png` — FAIL threshold тест болон `k6_exit=99` screenshot
+* `results/pic4.png` — FAIL threshold test screenshot
 * `.gitignore` — `node_modules` болон `.DS_Store`-ийг Git-д оруулахгүй
